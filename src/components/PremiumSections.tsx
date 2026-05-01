@@ -156,7 +156,7 @@ const PremiumSections = () => {
 
 const Section1Intro = () => {
   return (
-    <section className="premium-section flow-intro relative min-h-[82vh] bg-transparent z-20">
+    <section id="intro" className="premium-section flow-intro relative min-h-[82vh] bg-transparent z-20">
       <HeroHighlight containerClassName="flow-highlight-shell min-h-[82vh] items-center justify-start" className="w-full">
         <div className="flow-shell grid items-center gap-12 px-6 py-28 md:px-12 lg:grid-cols-[1.05fr_0.95fr] lg:px-24">
           <motion.div
@@ -221,7 +221,7 @@ const Section1Intro = () => {
 
 const Section2Features = () => {
   return (
-    <section className="premium-section feature-flow py-32 relative px-6 z-20">
+    <section id="services" className="premium-section feature-flow py-32 relative px-6 z-20">
       <motion.div
         className="flow-shell mx-auto mb-16 grid items-end gap-8 md:grid-cols-[0.9fr_0.7fr]"
         variants={fadeUp}
@@ -326,7 +326,7 @@ const Section3Process = () => {
   ];
 
   return (
-    <section className="premium-section process-flow py-32 relative z-20 bg-transparent">
+    <section id="process" className="premium-section process-flow py-32 relative z-20 bg-transparent">
       <TracingBeam className="px-6 relative z-10">
         <div className="flow-shell mx-auto grid items-start gap-10 pt-10 lg:grid-cols-[0.65fr_1fr]">
           <motion.div
@@ -385,7 +385,7 @@ const Section4Showcase = () => {
   ];
 
   return (
-    <section className="premium-section showcase-flow flex flex-col overflow-hidden relative z-20 pt-10">
+    <section id="work" className="premium-section showcase-flow flex flex-col overflow-hidden relative z-20 pt-10">
       <div className="relative z-10">
         <ContainerScroll
           titleComponent={
@@ -421,7 +421,7 @@ const Section4Showcase = () => {
       </div>
 
       <motion.div
-        className="showcase-parallax mt-[-20vh] relative z-20 pb-32"
+        className="showcase-parallax -mt-[4rem] md:-mt-[8rem] relative z-20 pb-32"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.2 }}
@@ -550,7 +550,7 @@ const Section6Statement = () => {
 
 const Section7CTA = () => {
   return (
-    <section className="premium-section cta-flow relative min-h-[54rem] flex items-center justify-center w-full z-20 overflow-hidden px-6">
+    <section id="capital" className="premium-section cta-flow relative min-h-[54rem] flex items-center justify-center w-full z-20 overflow-hidden px-6">
       <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="white" />
       <div className="cta-vortex" aria-hidden="true" />
       <motion.img
