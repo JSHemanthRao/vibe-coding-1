@@ -1,0 +1,143 @@
+.city-layers-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  overflow: hidden;
+  background: #000;
+}
+
+.city-layers-wrapper {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  will-change: transform;
+}
+
+.city-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.city-layer.base {
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.city-layer.highlight {
+  z-index: 2;
+  opacity: 0;
+}
+
+.city-layer.highlight.active {
+  opacity: 1;
+}
+
+.bottom-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(to top, #000 0%, transparent 100%);
+  z-index: 4;
+}
+
+/* Interactive Dots */
+.dots-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.position-dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.position-dot::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  animation: pulse-dot 2s infinite;
+}
+
+.dot-pulse {
+  position: absolute;
+  width: 400%;
+  height: 400%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.position-dot:hover .dot-pulse,
+.position-dot.active .dot-pulse {
+  opacity: 1;
+}
+
+.dot-label {
+  position: absolute;
+  top: -30px;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.position-dot:hover .dot-label,
+.position-dot.active .dot-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Positions for dots - these should be adjusted based on the generated image */
+.dot-1 {
+  top: 45%;
+  left: 50%;
+}
+
+.dot-2 {
+  top: 55%;
+  left: 35%;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(3); opacity: 0; }
+}
