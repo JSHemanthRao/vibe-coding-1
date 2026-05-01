@@ -18,7 +18,10 @@ const Navbar = () => {
 
   useMotionValueEvent(scrollY, 'change', latest => {
     const previous = lastYRef.current;
-    setVisible(latest < 80 || latest < previous);
+    const shouldBeVisible = latest < 80 || latest < previous;
+    if (visible !== shouldBeVisible) {
+      setVisible(shouldBeVisible);
+    }
     lastYRef.current = latest;
   });
 
@@ -31,7 +34,7 @@ const Navbar = () => {
     >
       <div className="nav-container">
         <div className="nav-logo">
-          <img src={logo} alt="SHARVEX" className="nav-logo-img" />
+          <img loading="lazy" decoding="async" src={logo} alt="SHARVEX" className="nav-logo-img" />
           <span>SHARVEX</span>
         </div>
         

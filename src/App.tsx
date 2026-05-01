@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
 import Preloader from './components/Preloader';
+import Hero from './components/Hero';
 import Chatbot from './components/Chatbot';
-import PremiumSections, { FollowingPointer } from './components/PremiumSections';
+import PremiumSections from './components/PremiumSections';
+import { FollowingPointer } from './components/FollowingPointer';
 import './App.css';
 
 function App() {

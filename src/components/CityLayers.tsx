@@ -14,45 +14,44 @@ const CityLayers = () => {
   const layersRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current || !layersRef.current) return;
+    if (!layersRef.current) return;
 
+    // gsap.quickTo is the officially recommended, highly optimized way to track mouse movement
+    // It creates a reusable tween and modifies it, avoiding creating new tweens 60 times a second.
+    const xTo = gsap.quickTo(layersRef.current, "x", { duration: 1, ease: "power2.out" });
+    const yTo = gsap.quickTo(layersRef.current, "y", { duration: 1, ease: "power2.out" });
+
+    const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
       const { innerWidth, innerHeight } = window;
-
       const xPos = (clientX / innerWidth - 0.5) * 40;
       const yPos = (clientY / innerHeight - 0.5) * 40;
-
-      gsap.to(layersRef.current, {
-        x: xPos,
-        y: yPos,
-        duration: 1,
-        ease: "power2.out"
-      });
+      
+      xTo(xPos);
+      yTo(yPos);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   return (
     <div className="city-layers-container" ref={containerRef}>
       <div className="city-layers-wrapper" ref={layersRef}>
         {/* Base Layer */}
-        <img 
-          src={cityBase} 
+        <img loading="lazy" decoding="async" src={cityBase} 
           className="city-layer base" 
           alt="City Base" 
         />
         
         {/* Highlight Layers */}
-        <img 
-          src={cityHighlight1} 
+        <img loading="lazy" decoding="async" src={cityHighlight1} 
           className={`city-layer highlight ${activeIndex === 1 ? 'active' : ''}`} 
           alt="Highlight 1" 
         />
-        <img 
-          src={cityHighlight2} 
+        <img loading="lazy" decoding="async" src={cityHighlight2} 
           className={`city-layer highlight ${activeIndex === 2 ? 'active' : ''}`} 
           alt="Highlight 2" 
         />

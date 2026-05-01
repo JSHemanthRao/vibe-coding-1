@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import {
   motion,
-  useMotionValue,
-  useSpring,
+  Variants,
 } from 'framer-motion';
 import {
   ArrowUpRight,
@@ -32,17 +31,17 @@ import { ParallaxScroll } from './ui/ParallaxScroll';
 import { HeroHighlight, Highlight } from './ui/HeroHighlight';
 import { TextGenerateEffect } from './ui/TextGenerateEffect';
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 34 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
   },
 };
 
-const imageParams = 'auto=format&fit=crop&q=80&sat=-100';
-const pexelsParams = 'auto=compress&cs=tinysrgb&w=2100';
+const imageParams = 'auto=format&fit=crop&fm=webp&q=80&sat=-100';
+const pexelsParams = 'auto=compress&cs=tinysrgb&fm=webp&w=1200';
 
 const images = {
   financeDashboard:
@@ -73,27 +72,49 @@ const images = {
     `https://images.unsplash.com/photo-1580489944761-15a19d654956?${imageParams}&w=400`,
 };
 
-export const FollowingPointer = () => {
-  const x = useMotionValue(-120);
-  const y = useMotionValue(-120);
-  const springX = useSpring(x, { stiffness: 180, damping: 24, mass: 0.35 });
-  const springY = useSpring(y, { stiffness: 180, damping: 24, mass: 0.35 });
+const introMetricsLabels = ['Vetted', 'Global', 'On-demand'];
 
-  useEffect(() => {
-    const handlePointerMove = (event: PointerEvent) => {
-      x.set(event.clientX - 17);
-      y.set(event.clientY - 17);
-    };
+const parallaxImages = [
+  images.darkTechnology,
+  images.darkTechnologyAlt,
+  images.financeDashboard,
+  images.blackAbstract,
+  images.financeData,
+  images.darkCityNight,
+  images.darkTechnologyGrid,
+  images.blackAbstractField,
+  images.darkCity,
+];
 
-    window.addEventListener('pointermove', handlePointerMove);
-    return () => window.removeEventListener('pointermove', handlePointerMove);
-  }, [x, y]);
+const testimonialsList = [
+  {
+    quote: 'Sharvex brought the exact technical rigor and speed we needed when every product decision mattered.',
+    name: 'Michael R.',
+    title: 'CTO, Global Tech Platform',
+    avatar: images.avatarOne,
+  },
+  {
+    quote: 'They operate like a strategy room, product team, and founder ally in one disciplined network.',
+    name: 'Sarah J.',
+    title: 'Founder and CEO, E-Commerce Group',
+    avatar: images.avatarTwo,
+  },
+  {
+    quote: 'The design work felt surgical. Fewer revisions, better questions, stronger outcomes.',
+    name: 'David W.',
+    title: 'VP of Product, FinTech Portfolio',
+    avatar: images.avatarThree,
+  },
+  {
+    quote: 'Their talent model turns complex engineering growth into a system the whole organization can scale.',
+    name: 'Elena T.',
+    title: 'Head of Engineering, Enterprise Software',
+    avatar: images.avatarFour,
+  },
+];
 
-  return (
-    <motion.div className="following-pointer" style={{ x: springX, y: springY }} aria-hidden="true">
-      <span />
-    </motion.div>
-  );
+const handleCTAClick = () => {
+  alert("Thank you for your interest! We will open the dialogue shortly.");
 };
 
 const PremiumSections = () => {
@@ -154,7 +175,7 @@ const PremiumSections = () => {
   );
 };
 
-const Section1Intro = () => {
+const Section1Intro = React.memo(() => {
   return (
     <section id="intro" className="premium-section flow-intro relative min-h-[82vh] bg-transparent z-20">
       <HeroHighlight containerClassName="flow-highlight-shell min-h-[82vh] items-center justify-start" className="w-full">
@@ -174,13 +195,13 @@ const Section1Intro = () => {
               We connect founders, operators, and technical leaders to a private network of builders who can move from strategy to shipped reality with precision.
             </p>
             <div className="intro-metrics mt-12 grid max-w-2xl grid-cols-3 gap-3">
-              {['Vetted', 'Global', 'On-demand'].map((label, index) => (
+              {introMetricsLabels.map((label, index) => (
                 <motion.div
                   key={label}
                   className="intro-metric"
                   initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.22 + index * 0.08, duration: 0.7 }}
+                  transition={{ delay: 0.1 + index * 0.05, duration: 0.4 }}
                   viewport={{ once: true }}
                 >
                   <span>{label}</span>
@@ -194,17 +215,17 @@ const Section1Intro = () => {
             className="intro-visual relative min-h-[420px]"
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.25, duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             viewport={{ once: true, amount: 0.35 }}
           >
-            <img src={images.darkCity} alt="Dark city skyline" className="intro-visual-image" />
+            <img loading="lazy" decoding="async" src={images.darkCity} alt="Dark city skyline" className="intro-visual-image" />
             <div className="intro-visual-grid" />
             <div className="intro-orbit intro-orbit-one" />
             <div className="intro-orbit intro-orbit-two" />
             <motion.div
               className="intro-signal-panel"
               animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             >
               <LineChart size={22} />
               <div>
@@ -217,9 +238,9 @@ const Section1Intro = () => {
       </HeroHighlight>
     </section>
   );
-};
+});
 
-const Section2Features = () => {
+const Section2Features = React.memo(() => {
   return (
     <section id="services" className="premium-section feature-flow py-32 relative px-6 z-20">
       <motion.div
@@ -240,7 +261,7 @@ const Section2Features = () => {
 
       <BentoGrid className="feature-bento max-w-7xl md:auto-rows-[23rem]">
         <WobbleCard containerClassName="cinematic-card feature-card col-span-1 md:col-span-2 min-h-[23rem] group rounded-lg">
-          <img src={images.darkTechnology} alt="Dark technology systems" className="card-image" />
+          <img loading="lazy" decoding="async" src={images.darkTechnology} alt="Dark technology systems" className="card-image" />
           <div className="card-gradient" />
           <div className="card-scan" />
           <div className="card-content">
@@ -253,7 +274,7 @@ const Section2Features = () => {
 
         <div className="cinematic-card feature-card monochrome-glare col-span-1 min-h-[23rem] group rounded-lg">
           <GlareCard className="relative h-full w-full overflow-hidden p-8">
-            <img src={images.blackAbstract} alt="Black abstract product surface" className="card-image" />
+            <img loading="lazy" decoding="async" src={images.blackAbstract} alt="Black abstract product surface" className="card-image" />
             <div className="card-gradient" />
             <div className="card-content">
               <PenTool className="card-icon" />
@@ -266,7 +287,7 @@ const Section2Features = () => {
 
         <div className="cinematic-card feature-card monochrome-glare col-span-1 min-h-[23rem] group rounded-lg">
           <GlareCard className="relative h-full w-full overflow-hidden p-8">
-            <img src={images.financeDashboard} alt="Dark finance analytics dashboard" className="card-image" />
+            <img loading="lazy" decoding="async" src={images.financeDashboard} alt="Dark finance analytics dashboard" className="card-image" />
             <div className="card-gradient" />
             <div className="card-content">
               <LineChart className="card-icon" />
@@ -278,7 +299,7 @@ const Section2Features = () => {
         </div>
 
         <WobbleCard containerClassName="cinematic-card feature-card col-span-1 md:col-span-2 min-h-[23rem] group rounded-lg">
-          <img src={images.darkCityNight} alt="Dark global city network" className="card-image" />
+          <img loading="lazy" decoding="async" src={images.darkCityNight} alt="Dark global city network" className="card-image" />
           <div className="card-gradient" />
           <div className="card-scan card-scan-alt" />
           <div className="card-content">
@@ -291,10 +312,20 @@ const Section2Features = () => {
       </BentoGrid>
     </section>
   );
-};
+});
 
-const Section3Process = () => {
-  const content = [
+const ProcessVisual = React.memo(({ image, icon, label }: { image: string; icon: React.ReactNode; label: string }) => (
+  <div className="process-visual group">
+    <img loading="lazy" decoding="async" src={image} className="process-visual-image" alt={label} />
+    <div className="process-visual-overlay" />
+    <div className="process-visual-grid" />
+    <div className="process-visual-icon">{icon}</div>
+    <span>{label}</span>
+  </div>
+));
+
+const Section3Process = React.memo(() => {
+  const content = useMemo(() => [
     {
       title: 'Listen: define the signal',
       description: 'We reduce ambition, constraints, and urgency into a precise execution thesis before talent is introduced.',
@@ -323,7 +354,7 @@ const Section3Process = () => {
         <ProcessVisual image={images.darkCityNight} icon={<LineChart className="process-icon" />} label="Scale review" />
       ),
     },
-  ];
+  ], []);
 
   return (
     <section id="process" className="premium-section process-flow py-32 relative z-20 bg-transparent">
@@ -347,7 +378,7 @@ const Section3Process = () => {
             className="process-scroll-shell"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.28, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             viewport={{ once: true, amount: 0.25 }}
           >
             <div className="process-grid-lines" />
@@ -357,32 +388,12 @@ const Section3Process = () => {
       </TracingBeam>
     </section>
   );
-};
+});
 
-const ProcessVisual = ({ image, icon, label }: { image: string; icon: React.ReactNode; label: string }) => (
-  <div className="process-visual group">
-    <img src={image} className="process-visual-image" alt={label} />
-    <div className="process-visual-overlay" />
-    <div className="process-visual-grid" />
-    <div className="process-visual-icon">{icon}</div>
-    <span>{label}</span>
-  </div>
-);
 
-const Section4Showcase = () => {
+
+const Section4Showcase = React.memo(() => {
   const [hovering, setHovering] = useState(false);
-
-  const parallaxImages = [
-    images.darkTechnology,
-    images.darkTechnologyAlt,
-    images.financeDashboard,
-    images.blackAbstract,
-    images.financeData,
-    images.darkCityNight,
-    images.darkTechnologyGrid,
-    images.blackAbstractField,
-    images.darkCity,
-  ];
 
   return (
     <section id="work" className="premium-section showcase-flow flex flex-col overflow-hidden relative z-20 pt-10">
@@ -393,7 +404,7 @@ const Section4Showcase = () => {
               className="showcase-title mb-12"
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               viewport={{ once: true }}
             >
               <p className="flow-kicker text-center">Cinematic portfolio</p>
@@ -409,7 +420,7 @@ const Section4Showcase = () => {
         >
           <Lens hovering={hovering} setHovering={setHovering} zoomFactor={1.5} lensSize={250} className="w-full h-full">
             <div className="showcase-lens-panel group">
-               <img src={images.darkTechnologyAlt} alt="Dark technology command surface" className="showcase-lens-image" />
+               <img loading="lazy" decoding="async" src={images.darkTechnologyAlt} alt="Dark technology command surface" className="showcase-lens-image" />
               <div className="showcase-lens-grid" />
               <div className="showcase-lens-shade" />
               <p>
@@ -421,45 +432,41 @@ const Section4Showcase = () => {
       </div>
 
       <motion.div
-        className="showcase-parallax -mt-[4rem] md:-mt-[8rem] relative z-20 pb-32"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.2 }}
-        viewport={{ once: true, amount: 0.15 }}
+        className="showcase-parallax mt-10 md:mt-16 relative z-20 pb-32"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        viewport={{ once: true, margin: "-50px" }}
       >
         <ParallaxScroll images={parallaxImages} />
       </motion.div>
     </section>
   );
-};
+});
 
-const Section5Testimonials = () => {
-  const testimonials = [
-    {
-      quote: 'Sharvex brought the exact technical rigor and speed we needed when every product decision mattered.',
-      name: 'Michael R.',
-      title: 'CTO, Global Tech Platform',
-      avatar: images.avatarOne,
-    },
-    {
-      quote: 'They operate like a strategy room, product team, and founder ally in one disciplined network.',
-      name: 'Sarah J.',
-      title: 'Founder and CEO, E-Commerce Group',
-      avatar: images.avatarTwo,
-    },
-    {
-      quote: 'The design work felt surgical. Fewer revisions, better questions, stronger outcomes.',
-      name: 'David W.',
-      title: 'VP of Product, FinTech Portfolio',
-      avatar: images.avatarThree,
-    },
-    {
-      quote: 'Their talent model turns complex engineering growth into a system the whole organization can scale.',
-      name: 'Elena T.',
-      title: 'Head of Engineering, Enterprise Software',
-      avatar: images.avatarFour,
-    },
-  ];
+const CardStack = React.memo(({ items }: { items: { quote: string; name: string; title: string; avatar?: string }[] }) => (
+  <div className="testimonial-stack" aria-label="Featured client notes">
+    {items.slice(0, 3).map((item, index) => (
+      <motion.article
+        key={item.name}
+        className="stack-card"
+        style={{ '--stack-index': index } as React.CSSProperties}
+        initial={{ opacity: 0, y: 24, rotate: -2 + index }}
+        whileInView={{ opacity: 1, y: 0, rotate: -2 + index }}
+        whileHover={{ y: -10, rotate: 0 }}
+        transition={{ delay: index * 0.05, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        viewport={{ once: true }}
+      >
+        {item.avatar && <img loading="lazy" decoding="async" src={item.avatar} alt={item.name} />}
+        <p>{item.quote}</p>
+        <span>{item.name}</span>
+        <small>{item.title}</small>
+      </motion.article>
+    ))}
+  </div>
+));
+
+const Section5Testimonials = React.memo(() => {
 
   return (
     <section className="premium-section testimonials-flow relative z-20 min-h-[52rem] overflow-hidden px-6 py-32">
@@ -475,48 +482,28 @@ const Section5Testimonials = () => {
           <p className="flow-copy mt-6">
             The testimony layer is glass, motion, and human proof: moving signals below, stacked voices above.
           </p>
-          <CardStack items={testimonials} />
+          <CardStack items={testimonialsList} />
         </motion.div>
 
         <motion.div
           className="testimonial-marquee-shell"
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.25, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           viewport={{ once: true, amount: 0.25 }}
         >
-          <img src={images.financeDashboard} alt="Financial dashboard glow" className="testimonial-bg-image" />
-          <InfiniteMovingCards items={testimonials} direction="right" speed="slow" className="testimonial-marquee" />
-          <InfiniteMovingCards items={[...testimonials].reverse()} direction="left" speed="normal" className="testimonial-marquee testimonial-marquee-secondary" />
+          <img loading="lazy" decoding="async" src={images.financeDashboard} alt="Financial dashboard glow" className="testimonial-bg-image" />
+          <InfiniteMovingCards items={testimonialsList} direction="right" speed="slow" className="testimonial-marquee" />
+          <InfiniteMovingCards items={[...testimonialsList].reverse()} direction="left" speed="normal" className="testimonial-marquee testimonial-marquee-secondary" />
         </motion.div>
       </div>
     </section>
   );
-};
+});
 
-const CardStack = ({ items }: { items: { quote: string; name: string; title: string; avatar?: string }[] }) => (
-  <div className="testimonial-stack" aria-label="Featured client notes">
-    {items.slice(0, 3).map((item, index) => (
-      <motion.article
-        key={item.name}
-        className="stack-card"
-        style={{ '--stack-index': index } as React.CSSProperties}
-        initial={{ opacity: 0, y: 24, rotate: -2 + index }}
-        whileInView={{ opacity: 1, y: 0, rotate: -2 + index }}
-        whileHover={{ y: -10, rotate: 0 }}
-        transition={{ delay: index * 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        viewport={{ once: true }}
-      >
-        {item.avatar && <img src={item.avatar} alt={item.name} />}
-        <p>{item.quote}</p>
-        <span>{item.name}</span>
-        <small>{item.title}</small>
-      </motion.article>
-    ))}
-  </div>
-);
 
-const Section6Statement = () => {
+
+const Section6Statement = React.memo(() => {
   return (
     <section className="premium-section statement-flow flex min-h-[78vh] w-full items-center justify-center overflow-hidden px-6 py-32 relative z-20">
       <motion.img
@@ -525,13 +512,13 @@ const Section6Statement = () => {
         className="statement-image"
         initial={{ opacity: 0, scale: 1.08 }}
         whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true }}
       />
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true }}
         className="statement-content text-center relative z-10"
       >
@@ -546,9 +533,9 @@ const Section6Statement = () => {
       </motion.div>
     </section>
   );
-};
+});
 
-const Section7CTA = () => {
+const Section7CTA = React.memo(() => {
   return (
     <section id="capital" className="premium-section cta-flow relative min-h-[54rem] flex items-center justify-center w-full z-20 overflow-hidden px-6">
       <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="white" />
@@ -559,7 +546,7 @@ const Section7CTA = () => {
         className="cta-image"
         initial={{ opacity: 0, scale: 1.08 }}
         whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true }}
       />
 
@@ -567,7 +554,7 @@ const Section7CTA = () => {
         className="cta-content relative z-10 flex flex-col items-center justify-center text-center"
         initial={{ opacity: 0, y: 32 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true, amount: 0.35 }}
       >
         <Network size={56} strokeWidth={1} className="text-white mb-10 opacity-70 drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]" />
@@ -581,9 +568,7 @@ const Section7CTA = () => {
           as="button"
           duration={1.4}
           className="bg-[#050505] text-white flex items-center space-x-3 px-10 py-5 text-sm uppercase font-bold"
-          onClick={() => {
-            alert("Thank you for your interest! We will open the dialogue shortly.");
-          }}
+          onClick={handleCTAClick}
         >
           <span>Hire Elite Talent</span>
           <ArrowUpRight size={20} className="text-neutral-400" />
@@ -591,9 +576,9 @@ const Section7CTA = () => {
       </motion.div>
     </section>
   );
-};
+});
 
-const Footer = () => (
+const Footer = React.memo(() => (
   <footer className="premium-section footer-flow w-full border-t border-white/[0.08] px-6 pb-12 pt-10 relative z-20 bg-transparent">
     <div className="footer-signal" aria-hidden="true" />
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pt-8 text-sm text-neutral-500 sm:flex-row sm:items-center sm:justify-between">
@@ -609,6 +594,6 @@ const Footer = () => (
       </div>
     </div>
   </footer>
-);
+));
 
 export default PremiumSections;

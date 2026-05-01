@@ -3,7 +3,15 @@ import gsap from 'gsap';
 import CityLayers from './CityLayers';
 import './Hero.css';
 
-const Hero = () => {
+const handleHireClick = () => {
+  document.getElementById('capital')?.scrollIntoView({ behavior: 'smooth' });
+};
+
+const handleJoinClick = () => {
+  document.getElementById('process')?.scrollIntoView({ behavior: 'smooth' });
+};
+
+const Hero = React.memo(() => {
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -60,14 +68,14 @@ const Hero = () => {
         <div className="hero-btns">
           <button 
             className="btn-primary" 
-            onClick={() => document.getElementById('capital')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={handleHireClick}
           >
             <span>Hire Elite Talent</span>
             <div className="btn-glow"></div>
           </button>
           <button 
             className="btn-secondary"
-            onClick={() => document.getElementById('process')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={handleJoinClick}
           >
             <span>Join Network</span>
           </button>
@@ -80,6 +88,6 @@ const Hero = () => {
       </div>
     </section>
   );
-};
+});
 
 export default Hero;

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MessageSquare, X, Send, User, Bot } from 'lucide-react';
 import './Chatbot.css';
 
@@ -9,7 +9,7 @@ interface Message {
   timestamp: Date;
 }
 
-const Chatbot: React.FC = () => {
+const Chatbot = React.memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem('sharvex_chat_history');
@@ -134,6 +134,22 @@ const Chatbot: React.FC = () => {
     });
   }, [inputValue, getBotResponse]);
 
+  const renderedMessages = useMemo(() => {
+    return messages.map((msg) => (
+      <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
+        <div className="avatar">
+          {msg.sender === 'user' ? <User size={14} /> : <Bot size={14} />}
+        </div>
+        <div className="message-bubble">
+          {msg.text}
+          <span className="timestamp">
+            {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
+      </div>
+    ));
+  }, [messages]);
+
   return (
     <div className={`chatbot-container ${isOpen ? 'active' : ''}`}>
       {/* Toggle Button */}
@@ -154,19 +170,7 @@ const Chatbot: React.FC = () => {
         </div>
 
         <div className="chat-messages">
-          {messages.map((msg) => (
-            <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
-              <div className="avatar">
-                {msg.sender === 'user' ? <User size={14} /> : <Bot size={14} />}
-              </div>
-              <div className="message-bubble">
-                {msg.text}
-                <span className="timestamp">
-                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-            </div>
-          ))}
+          {renderedMessages}
           {isTyping && (
             <div className="message-wrapper bot">
               <div className="avatar"><Bot size={14} /></div>
@@ -193,6 +197,6 @@ const Chatbot: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 export default Chatbot;

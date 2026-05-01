@@ -64,6 +64,7 @@
   color: rgba(255, 255, 255, 0.4);
   margin-bottom: 2.5rem;
   text-transform: uppercase;
+  will-change: transform, opacity;
 }
 
 .hero-title {
@@ -73,6 +74,7 @@
   color: #fff;
   margin-bottom: 1.8rem;
   letter-spacing: -0.02em;
+  will-change: transform, opacity;
 }
 
 .hero-title span {
@@ -91,12 +93,14 @@
   margin: 0 auto 3.5rem;
   line-height: 1.7;
   font-weight: 300;
+  will-change: transform, opacity;
 }
 
 .hero-btns {
   display: flex;
   gap: 24px;
   justify-content: center;
+  will-change: transform, opacity;
 }
 
 .btn-primary {
@@ -180,6 +184,7 @@
   color: rgba(255, 255, 255, 0.6);
   letter-spacing: 2px;
   text-transform: uppercase;
+  will-change: transform, opacity;
 }
 
 /* Decorative Background Glow */
