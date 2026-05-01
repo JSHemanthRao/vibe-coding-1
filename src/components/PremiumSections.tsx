@@ -581,6 +581,9 @@ const Section7CTA = () => {
           as="button"
           duration={1.4}
           className="bg-[#050505] text-white flex items-center space-x-3 px-10 py-5 text-sm uppercase font-bold"
+          onClick={() => {
+            alert("Thank you for your interest! We will open the dialogue shortly.");
+          }}
         >
           <span>Hire Elite Talent</span>
           <ArrowUpRight size={20} className="text-neutral-400" />

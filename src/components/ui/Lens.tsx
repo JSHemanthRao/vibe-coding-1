@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useMotionTemplate } from "framer-motion";
 import { cn } from "../../utils/cn";
 
 export const Lens = ({
@@ -25,19 +25,21 @@ export const Lens = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [localIsHovering, setLocalIsHovering] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 100, y: 100 });
+  const mouseX = useMotionValue(position.x);
+  const mouseY = useMotionValue(position.y);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (containerRef.current) {
+    if (containerRef.current && !isStatic) {
       const rect = containerRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setMousePosition({ x, y });
+      mouseX.set(e.clientX - rect.left);
+      mouseY.set(e.clientY - rect.top);
     }
   };
 
   const isHovering = hovering || localIsHovering;
-  const activePosition = isStatic ? position : mousePosition;
+
+  const clipPath = useMotionTemplate`circle(${lensSize / 2}px at ${mouseX}px ${mouseY}px)`;
+  const transformOrigin = useMotionTemplate`${mouseX}px ${mouseY}px`;
 
   return (
     <div
@@ -62,20 +64,21 @@ export const Lens = ({
           transition={{ duration: 0.3, ease: "easeOut" }}
           className="absolute inset-0 overflow-hidden pointer-events-none z-50 rounded-full flex items-center justify-center"
           style={{
-            maskImage: `radial-gradient(circle ${lensSize / 2}px at ${activePosition.x}px ${activePosition.y}px, black 100%, transparent 100%)`,
-            WebkitMaskImage: `radial-gradient(circle ${lensSize / 2}px at ${activePosition.x}px ${activePosition.y}px, black 100%, transparent 100%)`,
-            transformOrigin: `${activePosition.x}px ${activePosition.y}px`,
+            clipPath: clipPath,
+            WebkitClipPath: clipPath,
+            transformOrigin: transformOrigin,
+            willChange: "clip-path"
           }}
         >
-          <div
+          <motion.div
             className="absolute inset-0 pointer-events-none"
             style={{
               transform: `scale(${zoomFactor})`,
-              transformOrigin: `${activePosition.x}px ${activePosition.y}px`,
+              transformOrigin: transformOrigin,
             }}
           >
             {children}
-          </div>
+          </motion.div>
         </motion.div>
       ) : null}
     </div>

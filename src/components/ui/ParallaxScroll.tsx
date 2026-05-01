@@ -33,42 +33,39 @@ export const ParallaxScroll = ({
       ref={gridRef}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start max-w-7xl mx-auto gap-10 py-10 px-6">
-        <div className="grid gap-10">
+        <motion.div className="grid gap-10" style={{ y: translateFirst, willChange: "transform" }}>
           {firstPart.map((el, idx) => (
-            <motion.div
-              style={{ y: translateFirst }}
-              key={"grid-1" + idx}
-            >
+            <div key={"grid-1" + idx}>
               <img
                 src={el}
                 className="h-80 w-full object-cover rounded-xl gap-10 !m-0 !p-0 shadow-[0_0_24px_rgba(34,_42,_53,_0.06)] border border-white/[0.08]"
                 alt="thumbnail"
               />
-            </motion.div>
+            </div>
           ))}
-        </div>
-        <div className="grid gap-10">
+        </motion.div>
+        <motion.div className="grid gap-10" style={{ y: translateSecond, willChange: "transform" }}>
           {secondPart.map((el, idx) => (
-            <motion.div style={{ y: translateSecond }} key={"grid-2" + idx}>
+            <div key={"grid-2" + idx}>
               <img
                 src={el}
                 className="h-80 w-full object-cover rounded-xl gap-10 !m-0 !p-0 shadow-[0_0_24px_rgba(34,_42,_53,_0.06)] border border-white/[0.08]"
                 alt="thumbnail"
               />
-            </motion.div>
+            </div>
           ))}
-        </div>
-        <div className="grid gap-10">
+        </motion.div>
+        <motion.div className="grid gap-10" style={{ y: translateThird, willChange: "transform" }}>
           {thirdPart.map((el, idx) => (
-            <motion.div style={{ y: translateThird }} key={"grid-3" + idx}>
+            <div key={"grid-3" + idx}>
               <img
                 src={el}
                 className="h-80 w-full object-cover rounded-xl gap-10 !m-0 !p-0 shadow-[0_0_24px_rgba(34,_42,_53,_0.06)] border border-white/[0.08]"
                 alt="thumbnail"
               />
-            </motion.div>
+            </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

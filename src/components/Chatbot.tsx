@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Send, User, Bot } from 'lucide-react';
 import './Chatbot.css';
 
@@ -42,34 +42,7 @@ const Chatbot: React.FC = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now(),
-      text: inputValue,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue('');
-    setIsTyping(true);
-
-    // Simulate bot response
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: Date.now() + 1,
-        text: getBotResponse(inputValue),
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
-      setIsTyping(false);
-    }, 1500);
-  };
-
-  const getBotResponse = (input: string): string => {
+  const getBotResponse = useCallback((input: string): string => {
     const lowInput = input.toLowerCase();
     
     // Knowledge Base with Intent Scoring
@@ -133,7 +106,33 @@ const Chatbot: React.FC = () => {
     }
 
     return "I'm processing your inquiry through our strategic filters. Could you elaborate on the institutional or visionary context of your question?";
-  };
+  }, []);
+
+  const handleSend = useCallback(() => {
+    if (!inputValue.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now(),
+      text: inputValue,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setInputValue('');
+    
+    // Respond instantly without async blocking UI delays
+    requestAnimationFrame(() => {
+      setMessages((prev) => {
+        const botMessage: Message = {
+          id: Date.now() + 1,
+          text: getBotResponse(userMessage.text),
+          sender: 'bot',
+          timestamp: new Date(),
+        };
+        return [...prev, userMessage, botMessage];
+      });
+    });
+  }, [inputValue, getBotResponse]);
 
   return (
     <div className={`chatbot-container ${isOpen ? 'active' : ''}`}>

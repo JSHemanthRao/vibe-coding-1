@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Preloader from './components/Preloader';
-import SplashCursor from './components/SplashCursor';
 import Chatbot from './components/Chatbot';
 import PremiumSections, { FollowingPointer } from './components/PremiumSections';
 import './App.css';
@@ -13,7 +12,6 @@ function App() {
   return (
     <div className="app-container">
       {loading && <Preloader onComplete={() => setLoading(false)} />}
-      <SplashCursor COLOR="#ffffff" BACK_COLOR={{ r: 0, g: 0, b: 0 }} />
       <FollowingPointer />
       <Navbar />
       <Chatbot />

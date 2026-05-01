@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import GridScan from './GridScan';
 import CityLayers from './CityLayers';
 import './Hero.css';
 
@@ -44,22 +43,6 @@ const Hero = () => {
       {/* Background Effect */}
       <div className="video-container">
         <CityLayers />
-        <div className="grid-overlay">
-          <GridScan
-            sensitivity={0.1}
-            lineThickness={1}
-            linesColor="#ffffff"
-            gridScale={0.05}
-            scanColor="#ffffff"
-            scanOpacity={0.05}
-            enablePost={true}
-            bloomIntensity={0.2}
-            chromaticAberration={0.001}
-            noiseIntensity={0.01}
-            scanDuration={4.0}
-            scanDelay={2.0}
-          />
-        </div>
         <div className="hero-overlay"></div>
       </div>
 
@@ -75,11 +58,17 @@ const Hero = () => {
         </p>
         
         <div className="hero-btns">
-          <button className="btn-primary">
+          <button 
+            className="btn-primary" 
+            onClick={() => document.getElementById('capital')?.scrollIntoView({ behavior: 'smooth' })}
+          >
             <span>Hire Elite Talent</span>
             <div className="btn-glow"></div>
           </button>
-          <button className="btn-secondary">
+          <button 
+            className="btn-secondary"
+            onClick={() => document.getElementById('process')?.scrollIntoView({ behavior: 'smooth' })}
+          >
             <span>Join Network</span>
           </button>
         </div>
