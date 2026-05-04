@@ -33,16 +33,34 @@ export const TracingBeam = ({
   const y1 = useSpring(
     useTransform(scrollYProgress, [0, 0.8], [50, svgHeight]),
     {
-      stiffness: 500,
-      damping: 90,
+      stiffness: 200,
+      damping: 40,
     }
   );
   const y2 = useSpring(
     useTransform(scrollYProgress, [0, 1], [50, svgHeight - 200]),
     {
-      stiffness: 500,
-      damping: 90,
+      stiffness: 200,
+      damping: 40,
     }
+  );
+
+  const dotBoxShadow = useTransform(
+    scrollYProgress,
+    [0, 0.05],
+    ["rgba(0, 0, 0, 0.24) 0px 3px 8px", "none"]
+  );
+
+  const dotBgColor = useTransform(
+    scrollYProgress,
+    [0, 0.05],
+    ["var(--neutral-500)", "white"]
+  );
+
+  const dotBorderColor = useTransform(
+    scrollYProgress,
+    [0, 0.05],
+    ["var(--neutral-600)", "white"]
   );
 
   return (
@@ -52,28 +70,15 @@ export const TracingBeam = ({
     >
       <div className="absolute -left-4 md:-left-20 top-3">
         <motion.div
-          transition={{
-            duration: 0.2,
-            delay: 0.5,
-          }}
-          animate={{
-            boxShadow:
-              scrollYProgress.get() > 0
-                ? "none"
-                : "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+          style={{
+            boxShadow: dotBoxShadow,
           }}
           className="ml-[27px] h-4 w-4 rounded-full border border-neutral-800 shadow-sm flex items-center justify-center"
         >
           <motion.div
-            transition={{
-              duration: 0.2,
-              delay: 0.5,
-            }}
-            animate={{
-              backgroundColor:
-                scrollYProgress.get() > 0 ? "white" : "var(--neutral-500)",
-              borderColor:
-                scrollYProgress.get() > 0 ? "white" : "var(--neutral-600)",
+            style={{
+              backgroundColor: dotBgColor,
+              borderColor: dotBorderColor,
             }}
             className="h-2 w-2  rounded-full border border-neutral-700 bg-white"
           />
@@ -82,7 +87,7 @@ export const TracingBeam = ({
           viewBox={`0 0 20 ${svgHeight}`}
           width="20"
           height={svgHeight} // Set the SVG height
-          className=" ml-4 block"
+          className=" ml-4 block pointer-events-none"
           aria-hidden="true"
         >
           <motion.path

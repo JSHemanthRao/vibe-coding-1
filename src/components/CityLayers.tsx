@@ -26,7 +26,7 @@ const CityLayers = () => {
       const { innerWidth, innerHeight } = window;
       const xPos = (clientX / innerWidth - 0.5) * 40;
       const yPos = (clientY / innerHeight - 0.5) * 40;
-      
+
       xTo(xPos);
       yTo(yPos);
     };
@@ -41,24 +41,24 @@ const CityLayers = () => {
     <div className="city-layers-container" ref={containerRef}>
       <div className="city-layers-wrapper" ref={layersRef}>
         {/* Base Layer */}
-        <img loading="lazy" decoding="async" src={cityBase} 
-          className="city-layer base" 
-          alt="City Base" 
+        <img loading="lazy" decoding="async" src={cityBase}
+          className="city-layer base"
+          alt="City Base"
         />
-        
+
         {/* Highlight Layers */}
-        <img loading="lazy" decoding="async" src={cityHighlight1} 
-          className={`city-layer highlight ${activeIndex === 1 ? 'active' : ''}`} 
-          alt="Highlight 1" 
+        <img loading="lazy" decoding="async" src={cityHighlight1}
+          className={`city-layer highlight ${activeIndex === 1 ? 'active' : ''}`}
+          alt="Highlight 1"
         />
-        <img loading="lazy" decoding="async" src={cityHighlight2} 
-          className={`city-layer highlight ${activeIndex === 2 ? 'active' : ''}`} 
-          alt="Highlight 2" 
+        <img loading="lazy" decoding="async" src={cityHighlight2}
+          className={`city-layer highlight ${activeIndex === 2 ? 'active' : ''}`}
+          alt="Highlight 2"
         />
 
         {/* Interactive Dots */}
         <div className="dots-container">
-          <div 
+          <div
             className={`position-dot dot-1 ${activeIndex === 1 ? 'active' : ''}`}
             onMouseEnter={() => setActiveIndex(1)}
             onMouseLeave={() => setActiveIndex(0)}
@@ -67,7 +67,7 @@ const CityLayers = () => {
             <div className="dot-label">Global HQ</div>
           </div>
 
-          <div 
+          <div
             className={`position-dot dot-2 ${activeIndex === 2 ? 'active' : ''}`}
             onMouseEnter={() => setActiveIndex(2)}
             onMouseLeave={() => setActiveIndex(0)}
@@ -77,7 +77,7 @@ const CityLayers = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="bottom-gradient"></div>
     </div>
   );

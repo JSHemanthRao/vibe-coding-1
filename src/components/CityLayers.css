@@ -50,6 +50,7 @@
   height: 40%;
   background: linear-gradient(to top, #000 0%, transparent 100%);
   z-index: 4;
+  pointer-events: none;
 }
 
 /* Interactive Dots */
@@ -107,7 +108,7 @@
   top: -30px;
   white-space: nowrap;
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  /* backdrop-filter removed for perf */
   padding: 4px 12px;
   border-radius: 4px;
   font-size: 0.7rem;

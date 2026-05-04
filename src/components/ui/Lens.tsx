@@ -59,7 +59,7 @@ export const Lens = ({
       {isStatic || isHovering ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.58, filter: "blur(20px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)", transform: "translateZ(0)" }}
           exit={{ opacity: 0, scale: 0.8, filter: "blur(20px)" }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           className="absolute inset-0 overflow-hidden pointer-events-none z-50 rounded-full flex items-center justify-center"
@@ -67,14 +67,15 @@ export const Lens = ({
             clipPath: clipPath,
             WebkitClipPath: clipPath,
             transformOrigin: transformOrigin,
-            willChange: "clip-path"
+            willChange: "transform, clip-path, filter"
           }}
         >
           <motion.div
             className="absolute inset-0 pointer-events-none"
             style={{
-              transform: `scale(${zoomFactor})`,
+              transform: `scale(${zoomFactor}) translateZ(0)`,
               transformOrigin: transformOrigin,
+              willChange: "transform"
             }}
           >
             {children}

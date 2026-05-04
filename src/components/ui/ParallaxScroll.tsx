@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo, memo } from "react";
 import { cn } from "../../utils/cn";
 import { motion } from "framer-motion";
 
@@ -44,12 +44,12 @@ export const ParallaxScroll = ({
       <style>
         {`
           @keyframes v-scroll-up {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-33.3333%); }
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(0, -33.3333%, 0); }
           }
           @keyframes v-scroll-down {
-            0% { transform: translateY(-33.3333%); }
-            100% { transform: translateY(0); }
+            0% { transform: translate3d(0, -33.3333%, 0); }
+            100% { transform: translate3d(0, 0, 0); }
           }
           .animate-v-scroll-up {
             animation: v-scroll-up linear infinite;
@@ -80,10 +80,10 @@ export const ParallaxScroll = ({
 };
 
 // Memoized individual card
-const ImageCard = ({ src }: { src: string }) => {
+const ImageCard = memo(({ src }: { src: string }) => {
   return (
     <motion.div 
-      className="will-change-transform rounded-xl overflow-hidden shadow-lg border border-white/[0.08] relative shrink-0"
+      className="rounded-xl overflow-hidden shadow-lg border border-white/[0.08] relative shrink-0"
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.3 }}
     >
@@ -96,4 +96,4 @@ const ImageCard = ({ src }: { src: string }) => {
       />
     </motion.div>
   );
-};
+});

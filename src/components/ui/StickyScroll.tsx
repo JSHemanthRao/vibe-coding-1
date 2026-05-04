@@ -13,6 +13,7 @@ export const StickyScroll = ({
   contentClassName?: string;
 }) => {
   const [activeCard, setActiveCard] = React.useState(0);
+  const currentCardRef = useRef(0);
   const ref = useRef<any>(null);
   const { scrollYProgress } = useScroll({
     container: ref,
@@ -32,7 +33,10 @@ export const StickyScroll = ({
       },
       0
     );
-    setActiveCard(closestBreakpointIndex);
+    if (closestBreakpointIndex !== currentCardRef.current) {
+      currentCardRef.current = closestBreakpointIndex;
+      setActiveCard(closestBreakpointIndex);
+    }
   });
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { cn } from "../../utils/cn";
 
 export const WobbleCard = ({
@@ -11,15 +11,24 @@ export const WobbleCard = ({
   containerClassName?: string;
   className?: string;
 }) => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const x = useSpring(mouseX, { stiffness: 300, damping: 30 });
+  const y = useSpring(mouseY, { stiffness: 300, damping: 30 });
+
+  const invertedX = useTransform(x, (val) => -val);
+  const invertedY = useTransform(y, (val) => -val);
+
   const [isHovering, setIsHovering] = useState(false);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     const { clientX, clientY } = event;
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = (clientX - (rect.left + rect.width / 2)) / 20;
-    const y = (clientY - (rect.top + rect.height / 2)) / 20;
-    setMousePosition({ x, y });
+    const nx = (clientX - (rect.left + rect.width / 2)) / 20;
+    const ny = (clientY - (rect.top + rect.height / 2)) / 20;
+    mouseX.set(nx);
+    mouseY.set(ny);
   };
   return (
     <motion.section
@@ -27,13 +36,13 @@ export const WobbleCard = ({
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => {
         setIsHovering(false);
-        setMousePosition({ x: 0, y: 0 });
+        mouseX.set(0);
+        mouseY.set(0);
       }}
       style={{
-        transform: isHovering
-          ? `translate3d(${mousePosition.x}px, ${mousePosition.y}px, 0) scale3d(1, 1, 1)`
-          : "translate3d(0px, 0px, 0) scale3d(1, 1, 1)",
-        transition: "transform 0.1s ease-out",
+        x,
+        y,
+        willChange: "transform",
       }}
       className={cn(
         "mx-auto w-full bg-neutral-900 border border-white/10 relative rounded-2xl overflow-hidden",
@@ -49,10 +58,15 @@ export const WobbleCard = ({
       >
         <motion.div
           style={{
-            transform: isHovering
-              ? `translate3d(${-mousePosition.x}px, ${-mousePosition.y}px, 0) scale3d(1.03, 1.03, 1)`
-              : "translate3d(0px, 0px, 0) scale3d(1, 1, 1)",
-            transition: "transform 0.1s ease-out",
+            x: invertedX,
+            y: invertedY,
+            willChange: "transform",
+          }}
+          animate={{
+            scale: isHovering ? 1.03 : 1,
+          }}
+          transition={{
+            scale: { duration: 0.1, ease: "easeOut" },
           }}
           className={cn("h-full px-4 py-20 sm:px-10", className)}
         >

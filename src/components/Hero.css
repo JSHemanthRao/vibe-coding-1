@@ -160,7 +160,7 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  backdrop-filter: blur(10px);
+  /* backdrop-filter removed for perf */
   cursor: pointer;
 }
 
@@ -176,7 +176,7 @@
   bottom: 50px;
   z-index: 10;
   background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(10px);
+  /* backdrop-filter removed for perf */
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 14px 30px;
   border-radius: 100px;

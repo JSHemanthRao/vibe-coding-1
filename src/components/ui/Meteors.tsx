@@ -10,7 +10,7 @@ export const Meteors = ({
 }) => {
   const [meteors, setMeteors] = useState<number[]>([]);
   useEffect(() => {
-    setMeteors(new Array(number || 20).fill(true));
+    setMeteors(new Array(number || 10).fill(true));
   }, [number]);
 
   return (

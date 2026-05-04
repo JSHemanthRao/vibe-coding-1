@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState, memo } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState, memo, useMemo } from "react";
+import { motion, useMotionValue, useSpring, useMotionTemplate, useTransform } from "framer-motion";
 import { cn } from "../../utils/cn";
 
 export const TextRevealCard = ({
@@ -13,11 +13,13 @@ export const TextRevealCard = ({
   children?: React.ReactNode;
   className?: string;
 }) => {
-  const [widthPercentage, setWidthPercentage] = useState(0);
   const cardRef = useRef<HTMLDivElement | any>(null);
   const [left, setLeft] = useState(0);
   const [localWidth, setLocalWidth] = useState(0);
   const [isMouseOver, setIsMouseOver] = useState(false);
+
+  const widthPercentage = useMotionValue(0);
+  const animatedWidth = useSpring(widthPercentage, { stiffness: 400, damping: 40 });
 
   useEffect(() => {
     if (cardRef.current) {
@@ -32,17 +34,22 @@ export const TextRevealCard = ({
     const { clientX } = event;
     if (cardRef.current) {
       const relativeX = clientX - left;
-      setWidthPercentage((relativeX / localWidth) * 100);
+      widthPercentage.set((relativeX / localWidth) * 100);
     }
   }
 
   function mouseLeaveHandler() {
     setIsMouseOver(false);
-    setWidthPercentage(0);
+    widthPercentage.set(0);
   }
   function mouseEnterHandler() {
     setIsMouseOver(true);
   }
+
+  const clipPath = useMotionTemplate`inset(0 calc(100% - ${animatedWidth}%) 0 0)`;
+  const leftStyle = useMotionTemplate`${animatedWidth}%`;
+  const rotateStyle = useTransform(animatedWidth, (w) => (w === 100 ? 0 : isMouseOver ? w : 0));
+  const opacityStyle = useTransform(animatedWidth, (w) => (w > 0 ? 1 : 0));
 
   return (
     <div
@@ -61,17 +68,9 @@ export const TextRevealCard = ({
         <motion.div
           style={{
             width: "100%",
+            clipPath: isMouseOver ? clipPath : `inset(0 calc(100% - ${widthPercentage.get()}%) 0 0)`,
+            opacity: isMouseOver ? opacityStyle : (widthPercentage.get() > 0 ? 1 : 0),
           }}
-          animate={
-            isMouseOver
-              ? {
-                  opacity: widthPercentage > 0 ? 1 : 0,
-                  clipPath: `inset(0 ${100 - widthPercentage}% 0 0)`,
-                }
-              : {
-                  clipPath: `inset(0 ${100 - widthPercentage}% 0 0)`,
-                }
-          }
           transition={isMouseOver ? { duration: 0 } : { duration: 0.4 }}
           className="absolute bg-[#111] z-20 will-change-transform"
         >
@@ -85,16 +84,16 @@ export const TextRevealCard = ({
           </p>
         </motion.div>
         <motion.div
-          animate={{
-            left: `${widthPercentage}%`,
-            rotate: `${widthPercentage === 100 ? 0 : isMouseOver ? widthPercentage : 0}deg`,
-            opacity: widthPercentage > 0 ? 1 : 0,
+          style={{
+            left: leftStyle,
+            rotate: rotateStyle,
+            opacity: opacityStyle,
           }}
           transition={isMouseOver ? { duration: 0 } : { duration: 0.4 }}
           className="h-40 w-[8px] bg-gradient-to-b from-transparent via-neutral-500 to-transparent absolute z-50 will-change-transform"
         ></motion.div>
 
-        <div className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white,transparent)]">
+        <div className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white,transparent)] pointer-events-none">
           <p className="text-base sm:text-[3rem] py-10 font-bold bg-clip-text text-transparent bg-[#333]">
             {text}
           </p>
@@ -135,31 +134,42 @@ const Stars = () => {
   const randomMove = () => Math.random() * 4 - 2;
   const randomOpacity = () => Math.random();
   const random = () => Math.random();
+  
+  const starsData = useMemo(() => {
+    return [...Array(80)].map(() => ({
+      top: `${random() * 100}%`,
+      left: `${random() * 100}%`,
+      duration: random() * 10 + 20,
+      opacity: randomOpacity()
+    }));
+  }, []);
+
   return (
-    <div className="absolute inset-0">
-      {[...Array(80)].map((_, i) => (
+    <div className="absolute inset-0 pointer-events-none">
+      {starsData.map((star, i) => (
         <motion.span
           key={`star-${i}`}
           animate={{
-            top: `calc(${random() * 100}% + ${randomMove()}px)`,
-            left: `calc(${random() * 100}% + ${randomMove()}px)`,
-            opacity: randomOpacity(),
+            x: [0, randomMove(), 0],
+            y: [0, randomMove(), 0],
+            opacity: [star.opacity, randomOpacity(), star.opacity],
             scale: [1, 1.2, 0],
           }}
           transition={{
-            duration: random() * 10 + 20,
+            duration: star.duration,
             repeat: Infinity,
             ease: "linear",
           }}
           style={{
             position: "absolute",
-            top: `${random() * 100}%`,
-            left: `${random() * 100}%`,
+            top: star.top,
+            left: star.left,
             width: `2px`,
             height: `2px`,
             backgroundColor: "white",
             borderRadius: "50%",
             zIndex: 1,
+            willChange: "transform, opacity",
           }}
           className="inline-block"
         ></motion.span>
