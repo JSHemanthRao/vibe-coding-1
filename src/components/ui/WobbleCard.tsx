@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 import { cn } from "../../utils/cn";
+import { useWobble } from "../../hooks/useWobble";
 
-export const WobbleCard = ({
+export const WobbleCard = React.memo(({
   children,
   containerClassName,
   className,
@@ -11,34 +12,16 @@ export const WobbleCard = ({
   containerClassName?: string;
   className?: string;
 }) => {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const { 
+    x, y, invertedX, invertedY, isHovering, 
+    handleMouseMove, handleMouseEnter, handleMouseLeave 
+  } = useWobble();
 
-  const x = useSpring(mouseX, { stiffness: 300, damping: 30 });
-  const y = useSpring(mouseY, { stiffness: 300, damping: 30 });
-
-  const invertedX = useTransform(x, (val) => -val);
-  const invertedY = useTransform(y, (val) => -val);
-
-  const [isHovering, setIsHovering] = useState(false);
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
-    const { clientX, clientY } = event;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const nx = (clientX - (rect.left + rect.width / 2)) / 20;
-    const ny = (clientY - (rect.top + rect.height / 2)) / 20;
-    mouseX.set(nx);
-    mouseY.set(ny);
-  };
   return (
     <motion.section
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => {
-        setIsHovering(false);
-        mouseX.set(0);
-        mouseY.set(0);
-      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={{
         x,
         y,
@@ -75,4 +58,4 @@ export const WobbleCard = ({
       </div>
     </motion.section>
   );
-};
+});

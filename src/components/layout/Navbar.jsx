@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { motion, useMotionValueEvent, useScroll } from 'framer-motion';
 import './Navbar.css';
-import logo from '../assets/logo.png';
+import logo from '../../assets/logo.png';
 
 const navItems = [
   { label: 'Intro', href: '#intro' },

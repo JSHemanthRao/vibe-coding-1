@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-
-import './MagicRings.css';
+import { sceneManager } from './three/SceneManager';
 
 const vertexShader = `
 void main() {
@@ -11,11 +10,8 @@ void main() {
 
 const fragmentShader = `
 precision highp float;
-
-uniform float uTime, uAttenuation, uLineThickness;
-uniform float uBaseRadius, uRadiusStep, uScaleRate;
-uniform float uOpacity, uNoiseAmount, uRotation, uRingGap;
-uniform float uFadeIn, uFadeOut;
+uniform float uTime, uAttenuation, uLineThickness, uBaseRadius, uRadiusStep, uScaleRate;
+uniform float uOpacity, uNoiseAmount, uRotation, uRingGap, uFadeIn, uFadeOut;
 uniform float uMouseInfluence, uHoverAmount, uHoverScale, uParallax, uBurst;
 uniform vec2 uResolution, uMouse;
 uniform vec3 uColor, uColorTwo;
@@ -63,186 +59,122 @@ void main() {
 }
 `;
 
+interface MagicRingsProps {
+  id?: string;
+  color?: string; colorTwo?: string; speed?: number; ringCount?: number;
+  attenuation?: number; lineThickness?: number; baseRadius?: number;
+  radiusStep?: number; scaleRate?: number; opacity?: number;
+  noiseAmount?: number; rotation?: number; ringGap?: number;
+  fadeIn?: number; fadeOut?: number; followMouse?: boolean;
+  mouseInfluence?: number; hoverScale?: number; parallax?: number;
+  clickBurst?: boolean;
+}
+
+/**
+ * MagicRings (Headless Controller)
+ * Registers a shader mesh with the global SceneManager.
+ */
 export default function MagicRings({
-  color = '#ffffff',
-  colorTwo = '#8a8a8a',
-  speed = 1,
-  ringCount = 3,
-  attenuation = 10,
-  lineThickness = 2,
-  baseRadius = 0.35,
-  radiusStep = 0.1,
-  scaleRate = 0.1,
-  opacity = 1,
-  blur = 0,
-  noiseAmount = 0.1,
-  rotation = 0,
-  ringGap = 1.5,
-  fadeIn = 0.7,
-  fadeOut = 0.5,
-  followMouse = false,
-  mouseInfluence = 0.2,
-  hoverScale = 1.2,
-  parallax = 0.05,
-  clickBurst = false,
-}) {
-  const mountRef = useRef<HTMLDivElement>(null);
-  const propsRef = useRef<any>(null);
+  id = 'magic-rings',
+  color = '#ffffff', colorTwo = '#8a8a8a', speed = 1, ringCount = 3,
+  attenuation = 10, lineThickness = 2, baseRadius = 0.35,
+  radiusStep = 0.1, scaleRate = 0.1, opacity = 1, noiseAmount = 0.1,
+  rotation = 0, ringGap = 1.5, fadeIn = 0.7, fadeOut = 0.5,
+  followMouse = false, mouseInfluence = 0.2, hoverScale = 1.2,
+  parallax = 0.05, clickBurst = false,
+}: MagicRingsProps) {
+  const propsRef = useRef<MagicRingsProps>({
+    color, colorTwo, speed, ringCount, attenuation, lineThickness,
+    baseRadius, radiusStep, scaleRate, opacity, noiseAmount,
+    rotation, ringGap, fadeIn, fadeOut, followMouse, mouseInfluence,
+    hoverScale, parallax, clickBurst,
+  });
+
   const mouseRef = useRef([0, 0]);
   const smoothMouseRef = useRef([0, 0]);
   const hoverAmountRef = useRef(0);
   const isHoveredRef = useRef(false);
   const burstRef = useRef(0);
 
-  propsRef.current = {
-    color, colorTwo, speed, ringCount, attenuation, lineThickness,
-    baseRadius, radiusStep, scaleRate, opacity, noiseAmount,
-    rotation, ringGap, fadeIn, fadeOut, followMouse, mouseInfluence,
-    hoverScale, parallax, clickBurst,
-  };
+  useEffect(() => {
+    propsRef.current = {
+      color, colorTwo, speed, ringCount, attenuation, lineThickness,
+      baseRadius, radiusStep, scaleRate, opacity, noiseAmount,
+      rotation, ringGap, fadeIn, fadeOut, followMouse, mouseInfluence,
+      hoverScale, parallax, clickBurst,
+    };
+  }, [color, colorTwo, speed, ringCount, attenuation, lineThickness, baseRadius, radiusStep, scaleRate, opacity, noiseAmount, rotation, ringGap, fadeIn, fadeOut, followMouse, mouseInfluence, hoverScale, parallax, clickBurst]);
 
   useEffect(() => {
-    const mount = mountRef.current;
-    if (!mount) return;
-
-    let renderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ alpha: true });
-    } catch {
-      return;
-    }
-
-    if (!renderer.capabilities.isWebGL2) {
-      renderer.dispose();
-      return;
-    }
-
-    renderer.setClearColor(0x000000, 0);
-    mount.appendChild(renderer.domElement);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 10);
-    camera.position.z = 1;
-
+    const scene = sceneManager.getScene();
+    
     const uniforms = {
       uTime: { value: 0 },
-      uAttenuation: { value: 0 },
-      uResolution: { value: new THREE.Vector2() },
-      uColor: { value: new THREE.Color() },
-      uColorTwo: { value: new THREE.Color() },
-      uLineThickness: { value: 0 },
-      uBaseRadius: { value: 0 },
-      uRadiusStep: { value: 0 },
-      uScaleRate: { value: 0 },
-      uRingCount: { value: 0 },
-      uOpacity: { value: 1 },
-      uNoiseAmount: { value: 0 },
-      uRotation: { value: 0 },
-      uRingGap: { value: 1.6 },
-      uFadeIn: { value: 0.5 },
-      uFadeOut: { value: 0.75 },
+      uAttenuation: { value: 10 },
+      uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      uColor: { value: new THREE.Color(color) },
+      uColorTwo: { value: new THREE.Color(colorTwo) },
+      uLineThickness: { value: lineThickness },
+      uBaseRadius: { value: baseRadius },
+      uRadiusStep: { value: radiusStep },
+      uScaleRate: { value: scaleRate },
+      uRingCount: { value: ringCount },
+      uOpacity: { value: opacity },
+      uNoiseAmount: { value: noiseAmount },
+      uRotation: { value: (rotation * Math.PI) / 180 },
+      uRingGap: { value: ringGap },
+      uFadeIn: { value: fadeIn },
+      uFadeOut: { value: fadeOut },
       uMouse: { value: new THREE.Vector2() },
-      uMouseInfluence: { value: 0 },
+      uMouseInfluence: { value: followMouse ? mouseInfluence : 0 },
       uHoverAmount: { value: 0 },
-      uHoverScale: { value: 1 },
-      uParallax: { value: 0 },
+      uHoverScale: { value: hoverScale },
+      uParallax: { value: parallax },
       uBurst: { value: 0 },
     };
 
-    const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms, transparent: true });
-    const quad = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+    const geometry = sceneManager.getGeometry('fullscreen-plane', () => new THREE.PlaneGeometry(2, 2));
+    const material = sceneManager.getMaterial('magic-rings-mat', () => new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms, transparent: true })) as THREE.ShaderMaterial;
+    
+    const quad = new THREE.Mesh(geometry, material);
     scene.add(quad);
 
-    const resize = () => {
-      const w = mount.clientWidth;
-      const h = mount.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio, 2);
-      renderer.setSize(w, h);
-      renderer.setPixelRatio(dpr);
-      uniforms.uResolution.value.set(w * dpr, h * dpr);
-    };
-    resize();
-    window.addEventListener('resize', resize);
+    const onUpdate = (time: number) => {
+      const p = propsRef.current;
+      smoothMouseRef.current[0] += (mouseRef.current[0] - smoothMouseRef.current[0]) * 0.1;
+      smoothMouseRef.current[1] += (mouseRef.current[1] - smoothMouseRef.current[1]) * 0.1;
+      hoverAmountRef.current += ((isHoveredRef.current ? 1 : 0) - hoverAmountRef.current) * 0.1;
+      burstRef.current *= 0.94;
+      if (burstRef.current < 0.001) burstRef.current = 0;
 
-    const ro = new ResizeObserver(resize);
-    ro.observe(mount);
+      uniforms.uTime.value = time * 0.001 * (p.speed || 1);
+      uniforms.uAttenuation.value = p.attenuation || 10;
+      uniforms.uColor.value.set(p.color || '#fff');
+      uniforms.uColorTwo.value.set(p.colorTwo || '#888');
+      uniforms.uMouse.value.set(smoothMouseRef.current[0], smoothMouseRef.current[1]);
+      uniforms.uHoverAmount.value = hoverAmountRef.current;
+      uniforms.uBurst.value = p.clickBurst ? burstRef.current : 0;
+      uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+    };
+
+    sceneManager.addEntity(id, onUpdate);
 
     const onMouseMove = (e: MouseEvent) => {
-      const rect = mount.getBoundingClientRect();
-      mouseRef.current[0] = (e.clientX - rect.left) / rect.width - 0.5;
-      mouseRef.current[1] = -((e.clientY - rect.top) / rect.height - 0.5);
-    };
-    const onMouseEnter = () => { isHoveredRef.current = true; };
-    const onMouseLeave = () => {
-      isHoveredRef.current = false;
-      mouseRef.current[0] = 0;
-      mouseRef.current[1] = 0;
+      mouseRef.current[0] = (e.clientX / window.innerWidth) - 0.5;
+      mouseRef.current[1] = -((e.clientY / window.innerHeight) - 0.5);
     };
     const onClick = () => { burstRef.current = 1; };
 
-    mount.addEventListener('mousemove', onMouseMove);
-    mount.addEventListener('mouseenter', onMouseEnter);
-    mount.addEventListener('mouseleave', onMouseLeave);
-    mount.addEventListener('click', onClick);
-
-    let frameId;
-    let lastTime = 0;
-    const fpsInterval = 1000 / 60; // Cap to exactly 60 FPS
-
-    const animate = (t: number) => {
-      frameId = requestAnimationFrame(animate);
-      
-      const elapsed = t - lastTime;
-      if (elapsed < fpsInterval) return;
-      lastTime = t - (elapsed % fpsInterval);
-
-      const p = propsRef.current;
-
-      smoothMouseRef.current[0] += (mouseRef.current[0] - smoothMouseRef.current[0]) * 0.08;
-      smoothMouseRef.current[1] += (mouseRef.current[1] - smoothMouseRef.current[1]) * 0.08;
-      hoverAmountRef.current += ((isHoveredRef.current ? 1 : 0) - hoverAmountRef.current) * 0.08;
-      burstRef.current *= 0.95;
-      if (burstRef.current < 0.001) burstRef.current = 0;
-
-      uniforms.uTime.value = t * 0.001 * p.speed;
-      uniforms.uAttenuation.value = p.attenuation;
-      uniforms.uColor.value.set(p.color);
-      uniforms.uColorTwo.value.set(p.colorTwo);
-      uniforms.uLineThickness.value = p.lineThickness;
-      uniforms.uBaseRadius.value = p.baseRadius;
-      uniforms.uRadiusStep.value = p.radiusStep;
-      uniforms.uScaleRate.value = p.scaleRate;
-      uniforms.uRingCount.value = p.ringCount;
-      uniforms.uOpacity.value = p.opacity;
-      uniforms.uNoiseAmount.value = p.noiseAmount;
-      uniforms.uRotation.value = (p.rotation * Math.PI) / 180;
-      uniforms.uRingGap.value = p.ringGap;
-      uniforms.uFadeIn.value = p.fadeIn;
-      uniforms.uFadeOut.value = p.fadeOut;
-      uniforms.uMouse.value.set(smoothMouseRef.current[0], smoothMouseRef.current[1]);
-      uniforms.uMouseInfluence.value = p.followMouse ? p.mouseInfluence : 0;
-      uniforms.uHoverAmount.value = hoverAmountRef.current;
-      uniforms.uHoverScale.value = p.hoverScale;
-      uniforms.uParallax.value = p.parallax;
-      uniforms.uBurst.value = p.clickBurst ? burstRef.current : 0;
-
-      renderer.render(scene, camera);
-    };
-    frameId = requestAnimationFrame(animate);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('click', onClick);
 
     return () => {
-      cancelAnimationFrame(frameId);
-      window.removeEventListener('resize', resize);
-      ro.disconnect();
-      mount.removeEventListener('mousemove', onMouseMove);
-      mount.removeEventListener('mouseenter', onMouseEnter);
-      mount.removeEventListener('mouseleave', onMouseLeave);
-      mount.removeEventListener('click', onClick);
-      mount.removeChild(renderer.domElement);
-      renderer.dispose();
-      material.dispose();
+      sceneManager.removeEntity(id);
+      scene.remove(quad);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('click', onClick);
     };
-  }, []);
+  }, [id]);
 
-  return <div ref={mountRef} className="magic-rings-container" />;
+  return null; // Headless
 }

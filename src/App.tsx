@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import gsap from 'gsap';
-import Navbar from './components/Navbar';
-import Preloader from './components/Preloader';
-import Hero from './components/Hero';
-import Chatbot from './components/Chatbot';
-import PremiumSections from './components/PremiumSections';
-import { FollowingPointer } from './components/FollowingPointer';
+import Navbar from './components/layout/Navbar';
+import Preloader from './components/layout/Preloader';
+import Hero from './components/layout/Hero';
+import Chatbot from './components/layout/Chatbot';
+import PremiumSections from './components/layout/SectionOrchestrator';
+import { FollowingPointer } from './components/layout/FollowingPointer';
+import { ThreeBridge } from './components/ThreeBridge';
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
   return (
     <div className="app-container">
       {loading && <Preloader onComplete={() => setLoading(false)} />}
+      <ThreeBridge />
       <FollowingPointer />
       <Navbar />
       <Chatbot />

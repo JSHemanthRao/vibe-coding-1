@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-import './PremiumSections.css';
+import '../PremiumSections.css';
 
 export const FollowingPointer = () => {
   const x = useMotionValue(-120);

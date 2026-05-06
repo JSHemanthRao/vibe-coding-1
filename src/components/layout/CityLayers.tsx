@@ -4,9 +4,9 @@ import './CityLayers.css';
 
 // Using the absolute paths for now as they are generated in the appDataDir
 // In a production environment, these would be in the assets folder.
-import cityBase from '../assets/city-base.png';
-import cityHighlight1 from '../assets/city-highlight-1.png';
-import cityHighlight2 from '../assets/city-highlight-2.png';
+import cityBase from '../../assets/city-base.png';
+import cityHighlight1 from '../../assets/city-highlight-1.png';
+import cityHighlight2 from '../../assets/city-highlight-2.png';
 
 const CityLayers = () => {
   const [activeIndex, setActiveIndex] = useState(0);

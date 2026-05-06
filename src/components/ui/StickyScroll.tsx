@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useMemo } from "react";
 import { useMotionValueEvent, useScroll, motion } from "framer-motion";
 
 export const StickyScroll = ({
@@ -20,19 +20,20 @@ export const StickyScroll = ({
     offset: ["start start", "end start"],
   });
   const cardLength = content.length;
+  const cardsBreakpoints = useMemo(() => content.map((_, index) => index / cardLength), [cardLength]);
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const cardsBreakpoints = content.map((_, index) => index / cardLength);
-    const closestBreakpointIndex = cardsBreakpoints.reduce(
-      (acc, breakpoint, index) => {
-        const distance = Math.abs(latest - breakpoint);
-        if (distance < Math.abs(latest - cardsBreakpoints[acc])) {
-          return index;
-        }
-        return acc;
-      },
-      0
-    );
+    let closestBreakpointIndex = 0;
+    let minDistance = Math.abs(latest - cardsBreakpoints[0]);
+
+    for (let i = 1; i < cardsBreakpoints.length; i++) {
+      const distance = Math.abs(latest - cardsBreakpoints[i]);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestBreakpointIndex = i;
+      }
+    }
+
     if (closestBreakpointIndex !== currentCardRef.current) {
       currentCardRef.current = closestBreakpointIndex;
       setActiveCard(closestBreakpointIndex);
